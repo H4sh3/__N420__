@@ -1,0 +1,12 @@
+tests/
+venv/
+__pycache__/
+
+*.mp4
+*.jpg
+*.jpeg
+*.jpe
+*.jif
+*.jfif
+*.jfi
+*.png

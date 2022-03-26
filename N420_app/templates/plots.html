@@ -1,0 +1,162 @@
+{% extends 'index.html' %}
+
+
+
+
+
+
+{% block content %}
+
+
+<div class="panel panel-success">
+    <div class="panel-heading">DATA</div>
+    <div class="panel-body">
+        <div class="panel panel-success">
+            <div class="panel-heading">OPTIONS</div>
+            <div class="panel-body">
+                <form id="formFan">
+                    <div class="row">
+                        <div class="col">
+                            <input class="form-check-input" type="checkbox" name="temp" id="cbTemp" checked>
+                            <label class="form-check-label" for="cbTemp">TEMP.</label>
+                        </div>
+                        <div class="col">
+                            <input class="form-check-input" type="checkbox" name="hum" id="cbHum" checked>
+                            <label class="form-check-label" for="cbHum">HUM.</label>
+                        </div>
+                        <div class="col">
+                            <input class="form-check-input" type="checkbox" name="pres" id="cbpres">
+                            <label class="form-check-label" for="cbpres">PRES.</label>
+                        </div>
+                        <div class="col">
+                            <input class="form-check-input" type="checkbox" name="soil1" id="cbSoil1">
+                            <label class="form-check-label" for="cbSoil1">SOIL. 1</label>
+                        </div>
+                        <div class="col">
+                            <input class="form-check-input" type="checkbox" name="soil2" id="cbSoil2">
+                            <label class="form-check-label" for="cbSoil2">SOIL. 2</label>
+                        </div>
+                        <div class="col">
+                            <input class="form-check-input" type="checkbox" name="soil3" id="cbSoil3">
+                            <label class="form-check-label" for="cbSoil3">SOIL. 3</label>
+                        </div>
+                        <div class="col">
+                            <input class="form-check-input" type="checkbox" name="fan_state" id="cbFan">
+                            <label class="form-check-label" for="cbFan">FAN</label>
+                        </div>
+                        <div class="col">
+                            <input class="form-check-input" type="checkbox" name="lamp_state" id="cbLamp">
+                            <label class="form-check-label" for="cbLamp">LAMP</label>
+                        </div>
+                    </div>
+                    <p></p>
+                    <div class="row">
+                        <label class="range-label" for="days">DAYS: <output class="range_label"
+                                id="labelDays">10</output></label>
+                    </div>
+                    <div class="row">
+                        <input type="range" id="days" name="days" min="1" max="28" value="10"
+                            oninput="update_value_label('#labelDays', this.value)" />
+                    </div>
+
+                    <div class="row">
+                        </p>
+                        <input type="submit" value="LOAD" class="btn btn-success" id="submitOptions" />
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+
+        <div id="curve_chart"></div>
+        
+      
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+   
+    let myArray = [];
+    $(document).ready(function () {
+        $('form').on('submit', function (event) {
+            event.preventDefault();
+
+            // It returns a array of object 
+            let userinfo = $(this).serializeArray();
+            //console.log(userinfo)
+            let user = {};
+            userinfo.forEach((value) => {
+
+                // Dynamically create an object
+                user[value.name] = value.value;
+            });
+            let url = "/plots/options";
+            $.ajax({
+                method: "POST",
+                url: url,
+                data: user,
+                success: function (response) {
+                    console.log(response)
+                    let myData = response;
+                    let myArray = [];
+                    //console.log(myData)
+                    
+                    delete myData[0]['index'];
+                    var keys = Object.keys(myData[0]);
+                    var index = keys.indexOf("time");
+                    const element = keys.splice(index, 1)[0];     
+                    // console.log(keys)
+                    keys.splice(0, 0, element);             
+
+                    myArray.push(keys)
+
+                    myData.forEach(function (row) {
+                        delete row.index;
+                        let values = Object.values(row)
+                        const value = values.splice(index, 1)[0];     
+                        values.splice(0, 0, value); 
+
+                        myArray.push(values)
+                    });
+                    
+                    google.charts.load('current', { 'packages': ['corechart'] });
+                    google.charts.setOnLoadCallback(drawChart(myArray));
+                },
+                dataType: "json"
+            })
+        });
+    });
+
+
+
+
+
+
+
+
+    //updata range label
+    function update_value_label(label, value) {
+        document.querySelector(label).value = value;
+    }
+    
+    //plot
+    
+    
+    function drawChart(array) {
+
+        var data = google.visualization.arrayToDataTable(array);
+
+        var options = {
+            curveType: 'function',
+            legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+    }
+</script>
+{% endblock %}

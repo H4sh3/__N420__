@@ -1,0 +1,27 @@
+{% extends 'index.html' %}
+
+
+
+{% block content %}
+<div class="panel panel-success">
+   <div class="panel-heading">LIVE</div>
+   <div class="panel-body">
+      <form>
+
+         <img src="{{ url_for('video_feed') }}" width= "100%" >
+         
+      </form>
+   </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+
+
+
+
+   //updateData();
+   //setInterval(updateData, 1000);
+</script>
+{% endblock %}

@@ -1,0 +1,33 @@
+.navibar {
+
+    font-family: Franklin Gothic Medium;
+    font-size: 12;
+
+    height: 75;
+    width: 100%;
+}
+
+.btn-success {
+    width: 100%;
+  
+  
+}
+
+
+
+.range-label {
+    align-items:center;
+    font-size: 12;
+}
+
+.check-label  {
+    vertical-align: left;
+    font-size: 12;
+}
+
+logo {
+    font-family: "Brush Script MT";
+    font-size: 34;
+}
+
+

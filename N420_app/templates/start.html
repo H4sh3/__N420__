@@ -1,0 +1,154 @@
+{% extends 'index.html' %}
+
+
+
+{% block content %}
+
+
+
+
+
+
+<div class="panel panel-success">
+   <div class="panel-heading">SENSORDATA</div>
+   <div class="panel-body">
+
+      <div class="col">
+         <div class="panel panel-success">
+            <div class="panel-heading">SYSTEM</div>
+            <div class="panel-body">
+               <div class="row">
+                  <div class="col">
+                     <label class="form-check-label" for="time">TIME: </label>
+                     <span id="time"></span>
+                  </div>
+                  <div class="col">
+                     <label class="form-check-label" for="temp">TMEP. [&#x2103]: </label>
+                     <span id="temp"></span>
+                  </div>
+                  <div class="col">
+                     <label class="form-check-label" for="hum">HUM. [%]: </label>
+                     <span id="hum"></span>
+                  </div>
+                  <div class="col">
+                     <label class="form-check-label" for="pres">PRES. [mPa]: </label>
+                     <span id="pres"></span>
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         <div class="panel panel-success">
+            <div class="panel-heading">POTS</div>
+            <div class="panel-body">
+               <div class="row">
+                  <div class="col">
+                     <label class="form-check-label" for="soilmoist1">SOILMOIST 1: </label>
+                     <span id="soilmoist1"></span>
+                  </div>
+                  <div class="col">
+                     <label class="form-check-label" for="soilmoist2">SOILMOIST 2: </label>
+                     <span id="soilmoist2"></span>
+                  </div>
+                  <div class="col">
+                     <label class="form-check-label" for="soilmoist3">SOILMOIST 3: </label>
+                     <span id="soilmoist3"></span>
+                  </div>
+               </div>
+            </div>
+
+         </div>
+         <div class="panel panel-success">
+            <div class="panel-heading">ACTUATORS</div>
+            <div class="panel-body">
+               <div class="row">
+                  <div class="col">
+                     <label class="form-check-label" for="phase">PHASE: </label>
+                     <span id="phase"></span>
+                  </div>
+                  <div class="col">
+                     <label class="form-check-label" for="lamp">LAMP: </label>
+                     <span id="lamp"></span>
+                  </div>
+                  <div class="col">
+                     <label class="form-check-label" for="fan">FAN: </label>
+                     <span id="fan"></span>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+   let labels_ = ["time", "temp", "hum", "soil1", "soil2", "soil3", "pres", "lamp_phase", "lamp_state", "lamp_ontime", "lamp_g_state", "lamp_g_duration", "lamp_g_phase", "lamp_f_state", "lamp_f_duration", "lamp_f_phase", "state_pump", "irrigation_interval", "irrigation_duration", "soil_moist_hyst_min", "soil_moist_hyst_max", "pot1_state", "pot1_dry", "pot1_soil_moist", "pot2_state", "pot2_dry", "pot2_soil_moist", "pot3_state", "pot3_dry", "pot3_soil_moist", "temp_hyst_min", "temp_hyst_max", "hum_hyst_min", "hum_hyst_max", "state", "fan_state"]
+   let labels = ['#time', '#temp', '#hum', '#pres', '#phase', '#lamp',
+      '#fan', '#soilmoist1', '#soilmoist2', '#soilmoist3'];
+   let label_routes = [['time'], ['temp'], ['hum'], ['pres'],
+   ['lamp_phase'], ['lamp_state'], ['fan_state'], ['soil1'], ['soil2'], ['soil3']];
+   let my_data;
+
+   function updateData() {
+      fetch("/data")
+         .then(response => {
+            if (!response.ok)
+               throw new Error("fetch failed");
+
+            return response.json();
+         })
+         .then(json => my_data = json.data)
+
+      try {
+
+         labels.forEach((label, index) => {
+            let route = label_routes[index];
+            let my_route = label_routes[index]
+            let value = my_data;
+            my_route.forEach((sub_route) => {
+               value = value[sub_route];
+            });
+            if (value == true) {
+               value = 'ON'
+            }
+            if (value == false) {
+               value = 'OFF'
+            }
+            if (value == 'g') {
+               value = 'GROW'
+            }
+            if (value == 'f') {
+               value = 'FLOWER'
+            }
+            document.querySelector(label).textContent = value;
+
+         });
+      }
+      catch (e) {
+         // Anweisungen für jeden Fehler
+         console.log(e); // Fehler-Objekt an die Error-Funktion geben
+      }
+   }
+
+
+   updateData();
+   setInterval(updateData, 1000);
+
+</script>
+{% endblock %}

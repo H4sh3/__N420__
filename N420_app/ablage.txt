@@ -1,0 +1,7 @@
+{'data': {'time': '02:14:11', 'sensordata': {'temp': 0.9728669489836294, 'hum': 10, 'soil': {'soil1': 0.09828349120941067, 'soil2': 0.09828349120941067, 'soil3': 0.09828349120941067}, 'pres': 120}, 'lamp': {'phase': 'g', 'lamps': {'lamp_g': {'state': False, 'ontime': 2, 'duration': 3, 'phase': 'g'}, 'lamp_f': {'state': False, 'ontime': 2, 'duration': 5, 'phase': 'f'}}}, 'pot': {'state_pump': True, 'irrigation_interval': 8, 'irrigation_duration': 2, 'soil_moist_hyst_min': 0.4, 'soil_moist_hyst_max': True, 'pots': {'pot1': {'state': True, 'dry': True, 'soil_moist': 0.09828349120941067}, 'pot2': {'state': False, 'dry': True, 'soil_moist': 0.09828349120941067}, 'pot3': {'state': False, 'dry': True, 'soil_moist': 0.09828349120941067}}}, 'fan': {'temp_hyst_min': 25, 'temp_hyst_max': 30, 'hum_hyst_min': 50, 'hum_hyst_max': 60, 'fans': {'fan': {'state': False}}}}}
+
+n.forEach((num1, index) => {
+         const num2 = m[index];
+
+
+       });

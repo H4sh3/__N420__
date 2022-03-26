@@ -1,0 +1,262 @@
+{% extends 'index.html' %}
+
+
+
+{% block content %}
+
+<div class="panel panel-success">
+   <div class="panel-heading">PREFERENCES</div>
+   <div class="panel-body">
+
+      <div class="panel panel-success">
+         <div class="panel-heading">LAMP</div>
+         <div class="panel-body">
+            <form id="formFan">
+               <div class="row">
+                  <div class="col">
+                     <input class="form-check-input" type="radio" name="phase" id="grow" value="g">
+                     <label class="check-label" for="flexRadioDefault1">
+                        GROW
+                     </label>
+                  </div>
+
+                  <div class="col">
+                     <input class="form-check-input" type="radio" name="phase" id="flower" value="f">
+                     <label class="check-label" for="flexRadioDefault2">
+                     
+                        FLOWER
+                     </label>
+                  </div>
+
+                  <div class="col">
+                     <input type="time" id="time_start" name="time_start" height=20pt>
+                     <label class="check-label" for="time_start">start time</label>
+                  </div>
+               </div>
+               <div class="row">
+                  </p>
+                  <input type="submit" value="SUBMIT" class="btn btn-success" id="submitLamp" />
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+
+
+      <div class="panel panel-success">
+         <div class="panel-heading">POTS</div>
+         <div class="panel-body">
+
+            <form id="formFan">
+               <!-- irrigation durat-->
+               <div class="row">
+                  <label class="range-label" for="irrigation_duration">irrigation duration [s]: <output
+                        class="range_label" id="labelIrrigationDuration"></output></label>
+               </div>
+               <div class="row">
+                  <input type="range" id="irrigation_duration" name="irrigation_duration" min="0" max="30"
+                     oninput="update_value_label('#labelIrrigationDuration', this.value)"></input>
+               </div>
+
+               <!-- irrigation interval-->
+               <div class="row">
+                  <label class="range-label" for="irrigation_interval">irrigationinterval [h]: <output
+                        class="range_label" id="labelIrrigationInterval"></output></label>
+               </div>
+               <div class="row">
+                  <input type="range" id="irrigation_interval" name="irrigation_interval" min="0" max="24"
+                     oninput="update_value_label('#labelIrrigationInterval', this.value)"></input>
+               </div>
+
+               <!-- irrigation soil_moist_hyst_max-->
+               <div class="row">
+                  <label class="range-label" for="soil_moist_hyst_max">soil_moist_hyst_max: <output class="range_label"
+                        id="labelsoilMoistHystMax"></output></label>
+               </div>
+               <div class="row">
+                  <input type="range" id="soil_moist_hyst_max" name="soil_moist_hyst_max" min="0" max="100"
+                     oninput="update_value_label('#labelsoilMoistHystMax', this.value)"></input>
+               </div>
+
+               <!-- irrigation soil_moist_hyst_min-->
+               <div class="row">
+                  <label class="range-label" for="soil_moist_hyst_min">soil_moist_hyst_min: <output class="range_label"
+                        id="labelsoilMoistHystMin"></output></label>
+               </div>
+               <div class="row">
+                  <input type="range" id="soil_moist_hyst_min" name="soil_moist_hyst_min" min="0" max="100"
+                     oninput="update_value_label('#labelsoilMoistHystMin', this.value)"></input>
+               </div>
+
+               <div class="row">
+                  </p>
+                  <input type="submit" value="SUBMIT" class="btn btn-success" id="submitPots" />
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+
+
+   <div class="panel panel-success">
+      <div class="panel-heading">FAN</div>
+      <div class="panel-body">
+         <form id="formFan">
+            <!-- irrigation hum_hyst_max-->
+            <div class="row">
+               <label class="range-label" for="hum_hyst_max">hum_hyst_max: <output class="range_label"
+                     id="labelhumHystMax"></output></label>
+            </div>
+            <div class="row">
+               <input type="range" id="hum_hyst_max" name="hum_hyst_max" min="0" max="100"
+                  oninput="update_value_label('#labelhumHystMax', this.value)"></input>
+            </div>
+
+            <!-- irrigation hum_hyst_min-->
+            <div class="row">
+               <label class="range-label" for="hum_hyst_min">hum_hyst_min: <output class="range_label"
+                     id="labelhumHystMin"></output></label>
+            </div>
+            <div class="row">
+               <input type="range" id="hum_hyst_min" name="hum_hyst_min" min="0" max="100"
+                  oninput="update_value_label('#labelhumHystMin', this.value)"></input>
+            </div>
+
+            <!-- irrigation temp_hyst_max-->
+            <div class="row">
+               <label class="range-label" for="temp_hyst_max">temp_hyst_max: <output class="range_label"
+                     id="labelTempHystMax"></output></label>
+            </div>
+            <div class="row">
+               <input type="range" id="temp_hyst_max" name="temp_hyst_max" min="0" max="100"
+                  oninput="update_value_label('#labelTempHystMax', this.value)"></input>
+            </div>
+
+            <!-- irrigation temp_hyst_min-->
+            <div class="row">
+               <label class="range-label" for="temp_hyst_min">temp_hyst_min: <output class="range_label"
+                     id="labelTempHystMin"></output></label>
+            </div>
+            <div class="row">
+               <input type="range" id="temp_hyst_min" name="temp_hyst_min" min="0" max="100"
+                  oninput="update_value_label('#labelTempHystMin', this.value)" />
+            </div>
+
+
+
+
+            <div class="row">
+               </p>
+               <input type="submit" value="SUBMIT" class="btn btn-success" id="submitFan" />
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js">
+</script>
+<script type="text/javascript">
+   $(document).ready(function () {
+      $('form').on('submit', function (event) {
+         event.preventDefault();
+
+         // It returns a array of object 
+         let userinfo = $(this).serializeArray();
+         console.log(userinfo)
+         let user = {};
+         userinfo.forEach((value) => {
+
+            // Dynamically create an object
+            user[value.name] = value.value;
+         });
+         let url = "/preferences";
+         $.ajax({
+            method: "POST",
+            url: url,
+            data: user
+         })
+      });
+   });
+</script>
+
+
+<script>
+   //get data
+   let my_data = {{ data | tojson }}
+   console.log(my_data)
+
+   // init lamp module
+   updateLabelLamp()
+
+   function updateLabelLamp() {
+      console.log(my_data)
+      document.querySelector("#time_start").value = my_data.lamp_ontime;
+      if (my_data.lamp_phase == 'f') {
+         document.getElementById("flower").checked = true;
+      }
+      if (my_data.lamp_phase == 'g') {
+         document.getElementById("grow").checked = true;
+      }
+   }
+   
+
+   function update_value_label(label, value) {
+      document.querySelector(label).value = value;
+   }
+
+   // update ranges
+
+   let labels = ['#irrigation_duration',
+      '#irrigation_interval',
+
+      '#soil_moist_hyst_max',
+      '#soil_moist_hyst_min',
+
+      '#hum_hyst_max',
+      '#hum_hyst_min',
+
+      '#temp_hyst_max',
+      '#temp_hyst_min'];
+
+   let labels_value = ['#labelIrrigationDuration',
+      "#labelIrrigationInterval",
+
+      "#labelsoilMoistHystMax",
+      '#labelsoilMoistHystMin',
+
+      '#labelhumHystMax',
+      '#labelhumHystMin',
+
+      '#labelTempHystMax',
+      '#labelTempHystMin']
+
+   let label_routes = [['irrigation_duration'],
+   ['irrigation_interval'],
+   ['soil_moist_hyst_max'],
+   ['soil_moist_hyst_min'],
+   ['hum_hyst_max'],
+   ['hum_hyst_min'],
+   ['temp_hyst_max'],
+   ['temp_hyst_min']]
+
+
+   function fill_inputs() {
+      labels.forEach((label, index) => {
+         let route = label_routes[index];
+         let my_route = label_routes[index]
+         let value = my_data;
+         my_route.forEach((sub_route) => {
+            value = value[sub_route];
+         });
+         document.querySelector(label).value = value;
+         document.querySelector(labels_value[index]).value = value;
+      });
+   }
+
+
+   fill_inputs()
+
+
+</script>
+{% endblock %}
