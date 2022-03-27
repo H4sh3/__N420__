@@ -1,15 +1,16 @@
 
-from datetime import datetime
+
+from datetime import date, datetime, timedelta
 from time import time
 import cv2
 from pathlib import Path
 import os
 from threading import Thread
-import time
 
 
 class Cam():
-    capture_interval_minutes = 10
+    capture_interval = timedelta(minutes=10)
+    last_capture = datetime.now() - capture_interval
     path = "data\\pictures"
 
     cam = cv2.VideoCapture(0)
@@ -26,16 +27,18 @@ class Cam():
         cv2.imwrite(path, frame)
 
     def camptureLoop(self):
-        print('capture loop started')
+        print('starting loop')
         while True:
             success, frame = Cam.cam.read()  # read the cam frame
-
-            if success:
+            if not success:
+                pass
+            else:
                 _, buffer = cv2.imencode('.jpg', frame)
                 self.frame = buffer.tobytes()
+
+            if datetime.now() >= self.last_capture + self.capture_interval:
                 self.safe_frame(frame)
                 self.last_capture = datetime.now()
-                time.sleep(self.capture_interval*60)
 
     def get_frame(self):
         return self.frame
