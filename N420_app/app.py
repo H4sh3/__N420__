@@ -17,6 +17,7 @@ import json as js
 from growbox import Growbox, Lamp, Fan, Pot
 from threading import Thread
 import numpy as np
+from functools import wraps
 
 ###################################################################
 # LOGIN
@@ -47,7 +48,19 @@ camera = Cam()
 Growbox.init_actuators()
 
 
+##### Auth Decorator #####
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if g.user is None:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
 ###########################################################################################
+
+
 @app.before_request
 def before_request():
     g.user = None
@@ -81,22 +94,20 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.pop('username', None)
+    session.clear()
     return redirect(url_for('login'))
 
 
 ##########################################################################
 @app.route('/')
+@login_required
 def index():
-    if not g.user:
-        return redirect(url_for('login'))
     return render_template('start.html')
 
 
 @app.route("/data")
+@login_required
 def start():
-    if not g.user:
-        return redirect(url_for('login'))
     data = Growbox.build_data()  # {'time':time.time()}
     return jsonify({"data": data})
 
@@ -116,9 +127,8 @@ functions = {'phase': Lamp.set_phase,
 
 
 @app.route("/preferences", methods=["GET", "POST"])
+@login_required
 def preferences():
-    if not g.user:
-        return redirect(url_for('login'))
     data = Growbox.build_data()
     if request.method == "POST":
         print(dict(request.form))
@@ -162,9 +172,8 @@ def get_data(options):
 
 
 @app.route('/plots/options', methods=["GET", "POST"])
+@login_required
 def plots_options():
-    if not g.user:
-        return redirect(url_for('login'))
     options = dict(request.form)
     data = get_data(options)
     # print(data)
@@ -172,27 +181,24 @@ def plots_options():
 
 
 @app.route('/plots')
+@login_required
 def plots():
-    if not g.user:
-        return redirect(url_for('login'))
     return render_template('plots.html')
 
 ################################################################
 
 
 @app.route('/video_feed')
+@login_required
 def video_feed():
-    if not g.user:
-        return redirect(url_for('login'))
     return Response(gen(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/video')
+@login_required
 def video():
-    if not g.user:
-        return redirect(url_for('login'))
-    print('loading hmtl')
+    print('loading html')
     return render_template('video.html')
 
 
