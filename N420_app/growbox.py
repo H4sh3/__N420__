@@ -7,7 +7,6 @@ from sensors import Sensor
 import json as js
 
 
-
 class Growbox():
     actuators = []
     sensor = Sensor()
@@ -38,19 +37,19 @@ class Growbox():
 
     @classmethod
     def update_sensordata(cls):
-        cls.sensordata =  cls.sensor.get_data()    
+        cls.sensordata = cls.sensor.get_data()
 
     @classmethod
     def init_actuators(cls):
         print('init growbox')
         Growbox.update_sensordata()
-        Lamp(1, 'lamp_g', 18 , growth_phase='g')
+        Lamp(1, 'lamp_g', 18, growth_phase='g')
         Lamp(2, 'lamp_f', 12, growth_phase='f')
         Pot(3, 'pot1', 6, 'soil1')
         Pot(4, 'pot2', 6, 'soil2')
         Pot(5, 'pot3', 6, 'soil3')
         Fan(7, 'fan')
-        
+
         cls.update_sensordata()
         Lamp.update_lamps()
         Pot.update_pots()
@@ -61,7 +60,7 @@ class Growbox():
         if datetime.now() >= cls.last_log + cls.log_interval:
             print("loging data")
             cls.last_log = datetime.now()
-            
+
             cls.data_logger.write(js.dumps(cls.build_data()))
 
     @classmethod
@@ -78,10 +77,17 @@ class Growbox():
             except Exception as e:
                 cls.error_logger(repr(e))
                 raise e
-           
 
     @classmethod
     def build_data(cls):
+        return {
+            'time': datetime.now().strftime("%H:%M:%S"),
+            'date': datetime.now().strftime("%m/%d/%Y %H:%M:%S"),
+            'sensor': Growbox.sensordata,
+            'lamp': Lamp.get_data(),
+            'pot': Pot.get_data(),
+            'fan': Fan.get_data(),
+        }
         _data = {}
         _data['time'] = datetime.now().strftime("%H:%M:%S")
         _data['date'] = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
@@ -91,7 +97,7 @@ class Growbox():
         _data = _data | Fan.get_data()
         return _data
         ## print(js.dumps(_data, indent=4))
-        #exit()
+        # exit()
 
 
 class Lamp(Growbox):
@@ -99,44 +105,42 @@ class Lamp(Growbox):
     lamps = []
     phase = 'g'
     lamp_state = False
-    on_time = datetime.now() # time how long lamp stays on
-   
+    on_time = datetime.now()  # time how long lamp stays on
+
     def __init__(self, pin, id, duration, growth_phase='g'):
         super().__init__(pin, id)
         self.duration = duration
-        duration = timedelta(hours=duration) # time when lmap turns on
- 
-        
-        self.off_time = Lamp.on_time + duration # in hours
+        duration = timedelta(hours=duration)  # time when lmap turns on
+
+        self.off_time = Lamp.on_time + duration  # in hours
         self.growth_phase = growth_phase
         Lamp.lamps.append(self)
-
 
     @classmethod
     def get_data(cls):
         _data = {}
         _data['lamp_phase'] = cls.phase
         _data['lamp_state'] = cls.lamp_state
-        _data['lamp_ontime']=  cls.on_time.strftime("%H:%M")
+        _data['lamp_ontime'] = cls.on_time.strftime("%H:%M")
 
         for lamp in cls.lamps:
-            _data[lamp.id+ '_state']=lamp.state
-            _data[lamp.id+ '_duration']=lamp.duration
-            _data[lamp.id+ '_phase']=lamp.growth_phase
+            _data[lamp.id + '_state'] = lamp.state
+            _data[lamp.id + '_duration'] = lamp.duration
+            _data[lamp.id + '_phase'] = lamp.growth_phase
         return _data
 
     def update(self):
-        _time =Growbox.get_time()
+        _time = Growbox.get_time()
 
-        #turn off if not right phase
+        # turn off if not right phase
         if Lamp.phase != self.growth_phase and self.state:
             self.state = False
             # print(f"turning off {self.id}, not in phase")
 
         elif Lamp.phase == self.growth_phase:
-             # turning off
+            # turning off
             if self.state:
-                if _time> self.off_time or _time < Lamp.on_time:
+                if _time > self.off_time or _time < Lamp.on_time:
                     self.state = False
                     Lamp.lamp_state = False
                     # print(f"turning off {self.id}")
@@ -149,16 +153,15 @@ class Lamp(Growbox):
     @classmethod
     def set_phase(cls, phase):
         cls.phase = phase
-                
+
     @classmethod
     def update_lamps(cls):
         for lamp in cls.lamps:
             lamp.update()
 
-
     @classmethod
     def set_phase(cls, phase):
-        cls.phase = phase # 'g' or ''f'
+        cls.phase = phase  # 'g' or ''f'
 
     @classmethod
     def set_starttime(cls, starttime):
@@ -167,21 +170,21 @@ class Lamp(Growbox):
 
 class Pot(Growbox):
     pin_pump = 0
-    state_pump= False
+    state_pump = False
     pots = []
-    irrigation_interval = 80 # in seconds
-    irrigation_duration = 2 # in seconds
+    irrigation_interval = 80  # in seconds
+    irrigation_duration = 2  # in seconds
     soil_moist_hyst_min = 10
     soil_moist_hyst_max = 20
 
     def __init__(self, pin, state, pin_pump, index_soil):
         super().__init__(pin, state)
-        Pot.pin_pump=pin_pump
+        Pot.pin_pump = pin_pump
         Pot.pots.append(self)
-        self. index_soil = index_soil # index for dict form sensordate (available: "soil1", "soil2", "siol3")
+        # index for dict form sensordate (available: "soil1", "soil2", "siol3")
+        self. index_soil = index_soil
         self.flag_dry = False
         self.last_irrigation = datetime.now()-timedelta(seconds=Pot.irrigation_interval)
-
 
     @classmethod
     def get_data(cls):
@@ -195,11 +198,11 @@ class Pot(Growbox):
             _data[pot.id + '_state'] = pot.state
             _data[pot.id + '_dry'] = pot.flag_dry
             _data[pot.id + '_soil_moist'] = pot.soil_moist
-       
+
         return _data
 
     def update(self):
-        #update soil moist
+        # update soil moist
         self.soil_moist = Growbox.sensordata[self.index_soil]
         # raise flag if dry
         if self.soil_moist <= Pot.soil_moist_hyst_min:
@@ -222,46 +225,42 @@ class Pot(Growbox):
             _time_string = datetime.now().strftime("%H:%M:%S")
             # print(f"turning of pump at {_time_string}")
             # print(f"turning off {self.id}")
-            
+
     @classmethod
     def update_pots(cls):
         for pot in cls.pots:
             pot.update()
 
-
     @classmethod
-    def set_irrigation_interval(cls, irrigation_interval): # in hours
+    def set_irrigation_interval(cls, irrigation_interval):  # in hours
         cls.irrigation_interval = irrigation_interval
 
     @classmethod
-    def set_irrigation_duration(cls, irrigation_duration): # in seconds
+    def set_irrigation_duration(cls, irrigation_duration):  # in seconds
         cls.irrigation_duration = irrigation_duration
 
     @classmethod
-    def set_soil_moist_hyst_min(cls, soil_moist_hyst_min): 
+    def set_soil_moist_hyst_min(cls, soil_moist_hyst_min):
         cls.soil_moist_hyst_min = soil_moist_hyst_min
-    
+
     @classmethod
-    def set_soil_moist_hyst_max(cls, soil_moist_hyst_max): 
+    def set_soil_moist_hyst_max(cls, soil_moist_hyst_max):
         cls.soil_moist_hyst_max = soil_moist_hyst_max
 
 
-
-    
 class Fan(Growbox):
 
-    fans=[]
+    fans = []
     temp_hyst_min = 25
     temp_hyst_max = 30
     hum_hyst_min = 50
     hum_hyst_max = 60
     fans_state = False
-   
+
     def __init__(self, pin, id):
         super().__init__(pin, id)
 
         Fan.fans.append(self)
-    
 
     @classmethod
     def get_data(cls):
@@ -272,7 +271,7 @@ class Fan(Growbox):
         _data['hum_hyst_max'] = cls.hum_hyst_max
         _data['state'] = cls.fans_state
         for fan in cls.fans:
-            _data[fan.id + '_state'] =  fan.state
+            _data[fan.id + '_state'] = fan.state
         return _data
 
     def update(self):
@@ -284,11 +283,11 @@ class Fan(Growbox):
                 self.state = True
                 Fan.fans_state = True
                 # print(f"turning on {self.id}")
-        
-        elif self.state and  Fan.temp_hyst_min > temp and Fan.hum_hyst_min > hum:
-                self.state = False
-                Fan.fans_state = False
-                # print(f"turning on {self.id}") 
+
+        elif self.state and Fan.temp_hyst_min > temp and Fan.hum_hyst_min > hum:
+            self.state = False
+            Fan.fans_state = False
+            # print(f"turning on {self.id}")
 
     @classmethod
     def update_fans(cls):
@@ -296,29 +295,23 @@ class Fan(Growbox):
             fan.update()
 
     @classmethod
-    def set_temp_hyst_min(cls, temp_hyst_min): 
+    def set_temp_hyst_min(cls, temp_hyst_min):
         cls.temp_hyst_min = temp_hyst_min
 
     @classmethod
-    def set_temp_hyst_max(cls, temp_hyst_max): 
+    def set_temp_hyst_max(cls, temp_hyst_max):
         cls.temp_hyst_max = temp_hyst_max
 
     @classmethod
-    def set_hum_hyst_min(cls, hum_hyst_min): 
+    def set_hum_hyst_min(cls, hum_hyst_min):
         cls.hum_hyst_min = hum_hyst_min
 
     @classmethod
-    def set_hum_hyst_max(cls, hum_hyst_max): 
+    def set_hum_hyst_max(cls, hum_hyst_max):
         cls.hum_hyst_max = hum_hyst_max
 
- 
 
-if __name__=='__main__':
+if __name__ == '__main__':
 
     Growbox.init_actuators()
     Growbox.main_loop()
-    
-
-        
-
-  
